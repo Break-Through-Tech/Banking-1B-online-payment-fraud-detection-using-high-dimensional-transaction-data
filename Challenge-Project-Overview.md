@@ -1,42 +1,4 @@
----
 
-> ## Challenge Advisor: Update & Finalize Your Project Overview
->
-> > 💡 **These grey text instructions are just for you, the team's Challenge Advisor; please delete them once you have completed the steps below.**
->
-> We've pre-populated this Challenge Project Overview page — which is what will be shared with your Break Through Tech student team in August — using the details from your submission form. You should have received an email inviting you to join this repo as a Collaborator, enabling you to add files and make edits.
-> 
-> In order for your project to be finalized and assigned to a team, please:
-> 1. **Review all sections below** and update or expand any content as needed, making sure to address the SME Feedback in the section immediately below. Look for square brackets to find the places below that require additional inputs from you (e.g., "About [Company / Org Name]").
-> 2. **Add your dataset** to the [data folder](data) in this repo.
-> 3. **Close the Issue assigned to you in this repo** to let us know that you have made your edits and the overview page is ready for final review. You can do this by going to the _Issues_ tab in the top left section of the menu above, add a comment that says "CA review complete", and click the button to Close the Issue. 
->
-> If you're unfamiliar with how to edit a page like this in GitHub, check out [this tutorial](https://ubc-lib-geo.github.io/gis-workshop-waml-template/content/handson/edit-readme.html) for a quick overview (start with step 2 and only edit this page), and [this guide](https://ubc-lib-geo.github.io/gis-workshop-waml-template/content/markdown.html) on how to use Markdown to compose text.
->
->
-> ❌ Remember that this is a public repo. Do NOT include: Proprietary data, PII, API keys, credentials, or anything confidential.
-
----
-
-## 📋 BTT Internal Evaluation Notes
-*(This section is for BTT staff and CAs only — remove before sharing with students)*
-
-### Technical Vetting
-| Check | Status | Notes |
-| :--- | :--- | :--- |
-| Python Compatibility | 🟢 | The tech stack is centered on Python, using Python-compatible libraries for machine learning and data processing. |
-| Data Readiness | 🟢 | The IEEE-CIS Fraud Detection dataset is publicly available and appears ready for use, containing 590,000 transactions without significant preprocessing requirements indicated. |
-| Resource Check | 🟢 | Users can utilize Google Colab, which offers sufficient computing resources in its free tier without specialized hardware requirements. |
-
-### Internal Scores
-- **Student Fit Score:** 7/10
-- **Technical Depth Score:** 8/10
-- **Overall Recommendation:** REVISE
-
-### Advisor Feedback Draft
-The project has a clear application and relevant industry context, encouraging student engagement. However, the diversity of techniques may introduce confusion. Simplifying modeling options or focusing on a few key methods could improve clarity and success. Additionally, ensure that students are equipped with the skills to interpret model results effectively, as this is essential for real-world applications. Recommend providing workshops or resources on the specific ML libraries to be used.
-
----
 
 # Online Payment Fraud Detection Using High-Dimensional Transaction Data
 
