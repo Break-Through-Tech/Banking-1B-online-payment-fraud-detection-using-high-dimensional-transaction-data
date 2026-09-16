@@ -1,1 +1,31 @@
+# Core data handling
+numpy
+pandas
+pyarrow            # parquet I/O for the large IEEE-CIS tables
 
+# Modeling
+scikit-learn
+lightgbm
+xgboost
+catboost
+torch              # MLP / GRU / LSTM / Transformer experiments
+
+# Imbalance handling + tuning
+imbalanced-learn
+optuna
+
+# Explainability
+shap
+
+# Visualization
+matplotlib
+seaborn
+
+# Notebooks
+jupyterlab
+ipykernel
+ipywidgets
+tqdm
+
+# Dataset download
+kaggle

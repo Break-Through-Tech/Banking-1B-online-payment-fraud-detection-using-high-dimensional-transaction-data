@@ -1,1 +1,29 @@
+# macOS
+.DS_Store
 
+# Python
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+.ipynb_checkpoints/
+
+# Large dataset files — download from Kaggle, don't commit
+# (the two CSVs already tracked in this repo are re-included below)
+data/*.csv
+data/*.zip
+data/*.parquet
+!data/test_identity.csv
+!data/sample_submission.csv
+
+# Model artifacts & experiment output
+models/
+outputs/
+*.pkl
+*.joblib
+*.db
+
+# Secrets
+kaggle.json
+access_token
+.env
