@@ -6,7 +6,7 @@ Banking 1B · Break Through Tech AI Studio · Fall 2026
 
 ### 👥 **Team Members**
 
-Team names follow the [Team Alliance](https://docs.google.com/document/d/17AW2hXTLYdMQHgcYF3R-NMvCK_1ujHQXuc5blRLUXW0/edit?tab=t.0). Contributions are documented in the [combined EDA](notebooks/BTT_Mastercard_EDA_Combined.ipynb) and the final feature-engineering notebook's [team attribution table](notebooks/BTT_Mastercard_Feature_Engineering_Final.ipynb). Assigned modeling work follows the [October task plan](https://docs.google.com/document/d/1JGJLuNtPFucyJG5O20psLaR05h6cs0px0gejBr7NE5A/edit?tab=t.0).
+Team names follow the Team Alliance. Contributions are documented in the [combined EDA](notebooks/BTT_Mastercard_EDA_Combined.ipynb) and the final feature-engineering notebook's [team attribution table](notebooks/BTT_Mastercard_Feature_Engineering_Final.ipynb). Assigned modeling work follows the October task plan.
 
 | Name | GitHub Handle | Contribution |
 |---|---|---|
@@ -60,7 +60,7 @@ The full notebooks require several GB of RAM. Large datasets, generated features
 
 This Break Through Tech AI Studio project investigates whether transaction history and behavioral context improve online payment fraud detection. Using the public IEEE-CIS dataset, the team will compare conventional machine-learning baselines with neural networks and, where reliable account sequences can be constructed, temporal models.
 
-The intended outcome is a reproducible pipeline that improves fraud detection while measuring false alerts and review workload. The planned final deliverables include model evaluation, explanations of fraud-risk scores, and a lightweight prototype for scoring sample transactions. Scope and milestones are documented in the [Project Brief and Workplan](https://docs.google.com/document/d/1ODtH1VlzTyfoYWEl5Saj2oqifH6FETS7MzNWqx31ay4/edit?tab=t.0) and [Challenge Overview](Challenge-Project-Overview.md).
+The intended outcome is a reproducible pipeline that improves fraud detection while measuring false alerts and review workload. The planned final deliverables include model evaluation, explanations of fraud-risk scores, and a lightweight prototype for scoring sample transactions. Scope and milestones are documented in the Project Brief and Workplan and [Challenge Overview](Challenge-Project-Overview.md).
 
 ---
 
@@ -80,7 +80,7 @@ The current implementation prepares model inputs and evaluation tools. The [fina
 
 The modeling split is chronological: 80% training (472,432 rows), 10% validation (59,054), and 10% final holdout (59,054), with boundaries kept between timestamps. This divides the EDA's later 20% into validation and final holdout. Kaggle test labels are unavailable.
 
-The [October task plan](https://docs.google.com/document/d/1JGJLuNtPFucyJG5O20psLaR05h6cs0px0gejBr7NE5A/edit?tab=t.0) assigns the next experiments:
+The October task plan assigns the next experiments:
 
 | Planned experiment | Assigned members |
 |---|---|
@@ -130,9 +130,9 @@ A project license has not yet been selected. The team will confirm the license w
 
 ## 📄 **References**
 
-- [Team Alliance — Banking 1B](https://docs.google.com/document/d/17AW2hXTLYdMQHgcYF3R-NMvCK_1ujHQXuc5blRLUXW0/edit?tab=t.0): team roster and collaboration agreement.
-- [Milestone #2 Task Planning — October](https://docs.google.com/document/d/1JGJLuNtPFucyJG5O20psLaR05h6cs0px0gejBr7NE5A/edit?tab=t.0): assigned feature-engineering, modeling, and comparison tasks.
-- [Project Brief and Workplan](https://docs.google.com/document/d/1ODtH1VlzTyfoYWEl5Saj2oqifH6FETS7MzNWqx31ay4/edit?tab=t.0): objectives, success metrics, milestones, and tools.
+- Team Alliance — Banking 1B: team roster and collaboration agreement.
+- Milestone #2 Task Planning — October: assigned feature-engineering, modeling, and comparison tasks.
+- Project Brief and Workplan: objectives, success metrics, milestones, and tools.
 - [Challenge Overview](Challenge-Project-Overview.md) and [project plan](markdowns/plan.md).
 - [IEEE-CIS Fraud Detection dataset and competition](https://www.kaggle.com/competitions/ieee-fraud-detection).
 - [EDA summary notes](markdowns/EDA_Summary_Notes_1.md) and [EDA presentation](markdowns/BTT-Presentation-EDA.pptx).
