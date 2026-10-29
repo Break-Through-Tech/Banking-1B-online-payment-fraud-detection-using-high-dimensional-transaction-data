@@ -29,3 +29,6 @@ tqdm
 
 # Dataset download
 kaggle
+kagglehub
+scipy              # statistical tests in the EDA
+statsmodels        # multiple-testing correction in the EDA

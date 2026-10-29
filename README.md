@@ -1,121 +1,38 @@
-# AI Studio Challenge Project Title
+# Online Payment Fraud Detection
 
-> 💡 **Note for the team:** This is just a template. Update the above title with your AI Studio Challenge Project name. Remove all guidance notes and example text in this template and populate this README with your own content. You can work on this README throughout AI Studio, and get feedback from your AI Studio Coach and Challenge Advisor before finalizing it.  
+Banking 1B's Break Through Tech AI Studio project with Mastercard explores fraud detection using the high-dimensional IEEE-CIS transaction and identity data.
 
----
+## Setup
 
-### 👥 **Team Members**
+```bash
+python3 -m venv .venv
+source .venv/bin/activate
+pip install -r requirements.txt
+jupyter lab
+```
 
-**Example:**
+Accept the IEEE-CIS Fraud Detection competition rules in Kaggle before downloading the data. Choose either download workflow:
 
-| Name             | GitHub Handle | Contribution                                                             |
-|------------------|---------------|--------------------------------------------------------------------------|
-| Taylor Nguyen    | @taylornguyen | Data exploration, visualization, overall project coordination            |
-| Jordan Ramirez   | @jramirez     | Data collection, exploratory data analysis (EDA), dataset documentation  |
-| Amina Hassan     | @aminahassan  | Data preprocessing, feature engineering, data validation                 |
-| Priya Mehta      | @pmehta       | Model selection, hyperparameter tuning, model training and optimization  |
-| Chris Park       | @chrispark    | Model evaluation, performance analysis, results interpretation           |
+- **Notebook / Colab:** run [import_kaggle_data.ipynb](notebooks/import_kaggle_data.ipynb). It supports Kaggle login and, in a local checkout, credentials from environment variables, `.env`, or `~/.kaggle/kaggle.json`. To use `.env`, copy [.env.example](.env.example) and fill in your credentials. Never commit credentials or their notebook output.
+- **Local CLI:** authenticate with `.venv/bin/kaggle auth login`, then run `bash scripts/download_data.sh` to extract the competition files into `data/`.
 
----
+Large datasets, generated features, models, and local credentials are ignored by Git. The two CSVs already tracked in `data/` are retained.
 
-## 🎯 **Project Highlights**
+## Analysis workflow
 
-**Example:**
+1. [Import Kaggle data](notebooks/import_kaggle_data.ipynb): authenticate, download, list the files, and read the raw tables.
+2. [Combined EDA](notebooks/BTT_Mastercard_EDA_Combined.ipynb): the team's consolidated exploratory analysis, including time shifts, missingness, feature signals, and account structure. This supersedes `BTT-Mastercard-EDA_Done.ipynb`.
+3. [Final feature engineering](notebooks/BTT_Mastercard_Feature_Engineering_Final.ipynb): combined team features, chronological train/validation/holdout splits, leakage checks, and tree and neural-network input tables. Set `CONFIG["data_path"]` to the local `data/` folder to use the CLI download, or leave it as `None` to download with KaggleHub. Generated tables go under `outputs/feature_engineering/<run_name>/`.
 
-- Developed a machine learning model using `[model type/technique]` to address `[challenge project task]`.
-- Achieved `[key metric or result]`, demonstrating `[value or impact]` for `[host company]`.
-- Generated actionable insights to inform business decisions at `[host company or stakeholders]`.
-- Implemented `[specific methodology]` to address industry constraints or expectations.
+Run each analysis notebook from top to bottom. Full analysis requires the complete competition dataset; downloading data alone does not run the analysis or establish model performance.
 
----
+## Project documentation
 
-## 👩🏽‍💻 **Setup and Installation**
+- [Challenge overview](Challenge-Project-Overview.md)
+- [Getting started for fellows](Getting-Started-for-Fellows.md)
+- [Project plan](markdowns/plan.md)
+- [EDA summary notes](markdowns/EDA_Summary_Notes_1.md)
+- [Feature engineering explanation](markdowns/Feature_Engineering_Explained.md)
+- [Feature engineering summary](markdowns/BTT_Mastercard_Feature_Engineering_Summary.pdf)
 
-**Provide step-by-step instructions so someone else can run your code and reproduce your results. Depending on your setup, include:**
-
-* How to clone the repository
-* How to install dependencies
-* How to set up the environment
-* How to access the dataset(s)
-* How to run the notebook or scripts
-
----
-
-## 🏗️ **Project Overview**
-
-**Describe:**
-
-- How this project is connected to the Break Through Tech AI Program
-- Your AI Studio host company and the project objective and scope
-- The real-world significance of the problem and the potential impact of your work
-
----
-
-## 📊 **Data Exploration**
-
-**You might consider describing the following (as applicable):**
-
-* The dataset(s) used: origin, format, size, type of data
-* Data exploration and preprocessing approaches
-* Insights from your Exploratory Data Analysis (EDA)
-* Challenges and assumptions when working with the dataset(s)
-
-**Potential visualizations to include:**
-
-* Plots, charts, heatmaps, feature visualizations, sample dataset images
-
----
-
-## 🧠 **Model Development**
-
-**You might consider describing the following (as applicable):**
-
-* Model(s) used (e.g., CNN with transfer learning, regression models)
-* Feature selection and Hyperparameter tuning strategies
-* Training setup (e.g., % of data for training/validation, evaluation metric, baseline performance)
-
-
----
-
-## 📈 **Results & Key Findings**
-
-**You might consider describing the following (as applicable):**
-
-* Performance metrics (e.g., Accuracy, F1 score, RMSE)
-* How your model performed
-* Insights from evaluating model fairness
-
-**Potential visualizations to include:**
-
-* Confusion matrix, precision-recall curve, feature importance plot, prediction distribution, outputs from fairness or explainability tools
-
----
-
-## 🚀 **Next Steps**
-
-**You might consider addressing the following (as applicable):**
-
-* What are some of the limitations of your model?
-* What would you do differently with more time/resources?
-* What additional datasets or techniques would you explore?
-
----
-
-## 📝 **License**
-
-Specify how your project can be used by others. Choose an appropriate license and link it here (e.g., MIT, Apache 2.0). Make sure your Challenge Advisor approves of the selected license type. 
-
-**Example:**
-This project is licensed under the MIT License.
-
----
-
-## 📄 **References** (Optional but encouraged)
-
-Cite relevant papers, articles, or resources that supported your project.
-
----
-
-## 🙏 **Acknowledgements** (Optional but encouraged)
-
-Thank your Challenge Advisor, host company representatives, TA, and others who supported your project.
+Reports and presentations live in `markdowns/`; executable notebooks live in `notebooks/`. Duplicate notebook and report copies have been consolidated. Earlier notebook versions remain available in Git history.
