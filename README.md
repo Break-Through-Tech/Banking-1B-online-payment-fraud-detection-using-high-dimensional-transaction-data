@@ -1,6 +1,6 @@
 # Online Payment Fraud Detection Using High-Dimensional Transaction Data
 
-Banking 1B · Break Through Tech AI Studio · Mastercard · Fall 2026
+Banking 1B · Break Through Tech AI Studio · Fall 2026
 
 ---
 
@@ -58,7 +58,7 @@ The full notebooks require several GB of RAM. Large datasets, generated features
 
 ## 🏗️ **Project Overview**
 
-This Break Through Tech AI Studio project with Mastercard investigates whether transaction history and behavioral context improve online payment fraud detection. Using the public IEEE-CIS dataset, the team will compare conventional machine-learning baselines with neural networks and, where reliable account sequences can be constructed, temporal models.
+This Break Through Tech AI Studio project investigates whether transaction history and behavioral context improve online payment fraud detection. Using the public IEEE-CIS dataset, the team will compare conventional machine-learning baselines with neural networks and, where reliable account sequences can be constructed, temporal models.
 
 The intended outcome is a reproducible pipeline that improves fraud detection while measuring false alerts and review workload. The planned final deliverables include model evaluation, explanations of fraud-risk scores, and a lightweight prototype for scoring sample transactions. Scope and milestones are documented in the [Project Brief and Workplan](https://docs.google.com/document/d/1ODtH1VlzTyfoYWEl5Saj2oqifH6FETS7MzNWqx31ay4/edit?tab=t.0) and [Challenge Overview](Challenge-Project-Overview.md).
 
@@ -143,4 +143,4 @@ A project license has not yet been selected. The team will confirm the license w
 
 ## 🙏 **Acknowledgements**
 
-Thank you to Challenge Advisor **Debasmita Das**, AI Studio Coach **Harshini Donepudi**, **Mastercard**, and **Break Through Tech AI Studio** for guidance and support. We also acknowledge IEEE-CIS, Vesta, and Kaggle for making the competition data available, and every Banking 1B teammate for the analyses and feature-engineering work combined here.
+Thank you to Challenge Advisor **Debasmita Das**, AI Studio Coach **Harshini Donepudi**, and **Break Through Tech AI Studio** for guidance and support. We also acknowledge IEEE-CIS, Vesta, and Kaggle for making the competition data available, and every Banking 1B teammate for the analyses and feature-engineering work combined here.
