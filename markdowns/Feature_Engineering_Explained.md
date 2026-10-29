@@ -16,6 +16,43 @@ The notebook prepares those descriptions. It does not train a fraud model or pro
 
 The examples in this guide are illustrative unless identified as numbers from the saved full run.
 
+## Follow one payment through the notebook
+
+Suppose a new payment arrives with these details:
+
+| Information | Example value |
+|---|---|
+| Amount | 100 |
+| Product | W |
+| Elapsed timestamp | 3,600 seconds |
+| Card, address, and `D1` | Present, allowing an approximate account key |
+| Matching identity record | Absent |
+
+Our fixed training reference says that product W has a median amount of 20. The payment's card code appeared in 20 of 1,000 training payments. Separately, the activity log contains two strictly earlier payments for its approximate account: amount 10 at time 1,000 and amount 20 at time 3,500.
+
+The notebook turns those facts into several useful notes:
+
+| Feature | Value | What the reviewer can understand |
+|---|---:|---|
+| `TransactionAmt` | 100 | The payment amount |
+| `amount_log1p` | About 4.62 | Another representation of the same amount, on a compressed scale |
+| `amount_to_product_median` | 5 | Five times the product's training median: `100 / 20` |
+| `card1_train_frequency` | 0.02 | This card code appeared in 2% of the training reference: `20 / 1,000` |
+| `relative_hour` | 1 | Position 1 in the elapsed 24-hour cycle, calculated from `3,600 / 3,600` |
+| `has_identity_record` | 0 | No matching identity record was found |
+| `account_key_missing` | 0 | The transaction fields were sufficient to form the approximate key |
+| `account_has_prior_history` | 1 | The activity log contains earlier payments for that key |
+| `account_prior_count` | 2 | Two payments occurred before this one |
+| `account_prior_mean_amount` | 15 | Their average amount was `(10 + 20) / 2` |
+| `amount_to_prior_account_mean` | About 6.67 | This amount is about 6.67 times the earlier average: `100 / 15` |
+| `account_seconds_since_previous` | 100 | The previous payment timestamp was 100 seconds earlier: `3,600 - 3,500` |
+
+The missing identity record does not prevent this example's account grouping: the key comes from transaction fields, not device information. The elapsed-hour value does not establish that the payment happened at 1 a.m. in a real timezone.
+
+Notice that **20 training occurrences of a card code** and **two earlier payments for an approximate account** answer different questions. The first is a fixed population reference, using a broader card code. The second is time-aware activity for a more specific grouping key.
+
+The reviewer now has a richer description: a payment of 100, large relative to two different amount references, with two observed earlier payments and no identity record. None of those notes is a fraud verdict. The model must learn how useful they are when considered together with the other inputs.
+
 ## 1. Set up the workspace
 
 The first step finds the project and its data files, then sets the options for the run.
@@ -322,3 +359,19 @@ Validation guides those comparisons. The final holdout is evaluated once after m
 Useful questions for the modeling stage are how many alerts are correct (**precision**), how much fraud is caught (**recall**), and how many legitimate payments are incorrectly flagged. PR-AUC summarizes the precision/recall trade-off across alert thresholds; its exact scoring definition should be recorded. Reviewing only the top-risk 1% of payments is another practical way to compare models at a fixed review budget.
 
 The notebook has prepared clearer descriptions of payments. Whether those descriptions improve future fraud detection is the question the next experiment must answer.
+
+## A small vocabulary guide
+
+| Term | Plain-language meaning | Analogy |
+|---|---|---|
+| Feature | An input describing a payment | A note on the reviewer's form |
+| Label or target | The answer the model is learning to predict; here, `isFraud` | The separate answer sheet |
+| Fit | Learn a rule or reference from training data | Write the reference guide from the study cases |
+| Transform | Apply that rule to records | Use the guide to fill in the forms |
+| Category vocabulary | The category values allowed by the training schema | The approved choices on a form |
+| Median | The middle value after sorting | The person standing in the middle of an ordered line |
+| `NaN` | A missing numerical value | A blank box, rather than a box containing zero |
+| Metadata | Information kept for tracking and evaluation, rather than fed to the model here | The receipt's filing information |
+| Data leakage | Using information that the experiment should not have had | Reading a future activity-log entry or the answer sheet |
+| Validation | Later data used to compare choices | A practice exam |
+| Final holdout | Later data reserved for evaluating the finished choice | The final exam |
