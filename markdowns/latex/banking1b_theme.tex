@@ -1,0 +1,57 @@
+% Banking 1B slide theme (by Kyaw Thi (Eric) Ha) — custom palette (no blue), IBM Plex type
+\usepackage[sfdefault]{plex-sans}
+\usepackage{plex-mono}
+\usepackage{booktabs,tabularx,array,colortbl,graphicx,tikz,xcolor}
+\usetikzlibrary{positioning,arrows.meta,calc}
+
+\definecolor{ink}{HTML}{17211C}       % dark charcoal-green
+\definecolor{paper}{HTML}{FBFBF8}     % light background
+\definecolor{panel}{HTML}{ECEEE7}     % second background tone
+\definecolor{body}{HTML}{3D4741}      % softened body text
+\definecolor{muted}{HTML}{5E6862}
+\definecolor{rule}{HTML}{D6DAD2}
+\definecolor{emerald}{HTML}{16855A}   % accent 1
+\definecolor{amber}{HTML}{A97A06}     % accent 2
+\definecolor{mint}{HTML}{BFD9C8}      % light text on dark
+
+\setbeamercolor{background canvas}{bg=paper}
+\setbeamercolor{normal text}{fg=body,bg=paper}
+\setbeamercolor{frametitle}{fg=ink,bg=paper}
+\setbeamercolor{title}{fg=paper}
+\setbeamercolor{structure}{fg=emerald}
+\setbeamercolor{alerted text}{fg=emerald}
+\setbeamercolor{itemize item}{fg=emerald}
+\setbeamercolor{itemize subitem}{fg=amber}
+\setbeamercolor{enumerate item}{fg=emerald}
+\setbeamertemplate{navigation symbols}{}
+\setbeamertemplate{itemize item}{\raisebox{0.18em}{\rule{0.42em}{0.42em}}}
+\setbeamertemplate{itemize subitem}{\raisebox{0.22em}{\rule{0.3em}{0.3em}}}
+\setbeamerfont{frametitle}{size=\LARGE,series=\bfseries}
+\setbeamerfont{normal text}{size=\normalsize}
+\setlength{\leftmargini}{1.1em}
+\hyphenpenalty=10000 \exhyphenpenalty=10000
+\newcolumntype{L}{>{\raggedright\arraybackslash}X}
+\newcolumntype{B}[1]{>{\raggedright\arraybackslash\bfseries}p{#1}}
+
+% Eyebrow (section label) above every frame title + page footer
+\newcommand{\eyebrow}{}
+\setbeamertemplate{frametitle}{%
+  \vspace*{0.55cm}%
+  {\usebeamercolor[fg]{structure}\scriptsize\bfseries\MakeUppercase{\eyebrow}\par}\vspace{0.12cm}%
+  {\usebeamerfont{frametitle}\usebeamercolor[fg]{frametitle}\insertframetitle\par}%
+  \vspace{0.05cm}}
+\setbeamertemplate{footline}{%
+  \hbox to \paperwidth{\hspace{0.9cm}{\color{muted}\tiny Banking 1B \textperiodcentered{} Fraud detection progress update \textperiodcentered{} November 2026}\hfill{\color{muted}\tiny\insertframenumber}\hspace{0.9cm}}\vspace{0.35cm}}
+\setbeamersize{text margin left=0.9cm, text margin right=0.9cm}
+
+\newcommand{\eb}[1]{\renewcommand{\eyebrow}{#1}}
+\newcommand{\num}[1]{{\fontseries{b}\selectfont #1}}
+\newcommand{\who}[1]{{\color{muted}\scriptsize #1}}
+
+% A tinted card
+\newcommand{\card}[3][panel]{%
+  \begin{tikzpicture}\node[fill=#1,rounded corners=4pt,inner sep=9pt,text width=#2,align=left]{#3};\end{tikzpicture}}
+
+% Big stat block: number, label
+\newcommand{\stat}[3][emerald]{%
+  \begin{minipage}[t]{0.3\linewidth}\raggedright{\color{#1}\fontsize{30}{32}\selectfont\bfseries #2}\\[2pt]{\small\color{body}#3}\end{minipage}}
