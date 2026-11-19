@@ -72,73 +72,41 @@ Commit a tiny sample dataset and hardcoded sample JSON on Day 1, so the front en
 
 Each person owns one folder. Cross-person needs go through contracts/, never by editing someone else's folder. The only real handoffs are: P1's split (Day 2), features to model (Days 3 to 4), model to serving (Days 4 to 5), and API to front end and dashboards (Days 5 to 6). Everything else runs in parallel against the frozen contracts and mocks.
 
-### P1 — Data and split  (folder: data/)
-Provides: train/val/test tables + sample.parquet. Owns the data_schema contract. Needs: nothing (starts first).
-- D1: agree data_schema, write the time-split logic, commit sample.parquet to contracts/sample_data.
-- D2: publish real train/val/test to the shared drive. Unblocks P2, P3, P4.
-- D3: verify no leakage, document columns.
-- D4-5: fix any schema issues features or model hit.
-- D6-7: integration support.
+## Per-person plan (7 people, 7 days)
 
-### P2 — Tabular features  (folder: features/tabular/)
-Provides: tab_* feature table. Needs: data schema (P1).
-- D1: read schema, start on the sample.
-- D2: build tab_* on the real train split (frequency encodings, per-card aggregates, amount and time features).
-- D3: finish first pass, check the join keys with P1.
-- D4: refine, hand the final table to P4.
-- D5-7: fix issues flagged by eval, integration.
+### Roles and primary tools
 
-### P3 — Graph features  (folder: features/graph/)
-Provides: g_* feature table. Needs: data schema (P1).
-- D1: read schema, design nodes and edges on the sample.
-- D2: build the identifier graph (card, device, email) with NetworkX.
-- D3: compute g_* (cluster size, degree, time-aware neighbor fraud rate), enforcing the past-only rule.
-- D4: finalize, hand to P4.
-- D5-7: integration, explainability support.
+| Person | Owns (folder) | Primary tools |
+| --- | --- | --- |
+| **P1 — Data + split** | data/ | Python, pandas or Polars, Parquet |
+| **P2 — Tabular features** | features/tabular/ | pandas, scikit-learn (encoders) |
+| **P3 — Graph features** | features/graph/ | NetworkX, pandas |
+| **P4 — Model + evaluation** | model/ | XGBoost, SHAP, scikit-learn (metrics), MLflow |
+| **P5 — Serving + streaming** | serving/ | FastAPI, Docker, Kafka, Spark Structured Streaming, Postgres |
+| **P6 — Front end** | frontend/ | React / Next.js |
+| **P7 — Dashboards + orchestration** | dashboards/, airflow/ | React + Recharts, Airflow, WebSocket |
 
-### P4 — Model and evaluation  (folder: model/)
-Provides: model.pkl, transform.pkl, feature_list.json, score_mapping.json, honest metrics. Owns the model-interface contract. Needs: features (P2, P3).
-- D1: scaffold training + eval harness on mock features; write model_interface.
-- D2: baseline model on tab_*.
-- D3: combine tab_* + g_*, first real model + SHAP.
-- D4: tune, publish artifacts, report PR-AUC, KS, detection at review budget.
-- D5: hand model to P5.
-- D6-7: final eval, with-vs-without-graph comparison, results into this README.
+Only four handoffs cross people: P1's split (Day 2), features to model (Days 3 to 4), model to serving (Days 4 to 5), API to front end and dashboards (Days 5 to 6). Everything else runs in parallel against the frozen contracts and mocks.
 
-### P5 — Serving and streaming  (folder: serving/)  [heaviest role]
-Provides: scoring API + streaming path. Co-owns the API contract. Needs: model interface (P4), uses a dummy model until D4.
-- D1: FastAPI on a dummy model returning the ScoreResult shape; Docker.
-- D2: build /score, /alerts, /alerts/respond on the dummy + Postgres.
-- D3: Kafka running locally + a replay script.
-- D4: Spark Structured Streaming consuming Kafka; load P4's real model.
-- D5: integration, real model behind the API.
-- D6: streaming path end to end (Kafka to Spark to score to db).
-- D7: polish, report p50 and p95 latency.
+### Day by day
 
-### P6 — Front end  (folder: frontend/)
-Provides: cardholder + analyst apps. Co-owns the API contract. Needs: API contract (mock until D5).
-- D1: scaffold React, read the API contract, set up a mock API with static JSON.
-- D2: cardholder confirm screen on the mock.
-- D3: analyst view on the mock.
-- D4: polish.
-- D5: integration, point to the real API.
-- D6-7: fixes, demo polish.
-
-### P7 — Dashboards and orchestration  (folder: dashboards/, airflow/)  [second heaviest]
-Provides: metrics dashboards + Airflow DAGs. Needs: /metrics contract (mock until D5).
-- D1: scaffold the dashboard on mock /metrics; Airflow skeleton (docker-compose).
-- D2: KPI cards + charts on the mock.
-- D3: dashboards functional; draft the retrain DAG.
-- D4: DAG runs retrain on a schedule + a drift check.
-- D5: integration, real /metrics.
-- D6: live replay over WebSocket if time allows.
-- D7: polish, demo.
+| Person | Day 1 | Day 2 | Day 3 | Day 4 | Day 5 | Day 6 | Day 7 |
+| --- | --- | --- | --- | --- | --- | --- | --- |
+| **P1** | agree data_schema; commit sample.parquet | publish real split (Parquet) | leakage check; document columns | fix schema issues | integration support | integration support | buffer / demo support |
+| **P2** | read schema; start on sample (pandas) | build tab_* on train (encodings, aggregates) | finish first pass; key-check with P1 | finalize; hand to P4 | fix eval issues | integration | polish |
+| **P3** | design nodes/edges on sample | build identifier graph (NetworkX) | compute g_* (past-only neighbor stats) | finalize; hand to P4 | integration | integration | polish |
+| **P4** | eval harness on mock; write model_interface | baseline on tab_* (XGBoost) | combine tab_* + g_*; model + SHAP | tune; publish artifacts; report metrics | hand model to P5 | with vs without graph compare | results into README |
+| **P5** | FastAPI on dummy model; Docker | /score, /alerts, /respond; Postgres | Kafka local + replay script | Spark Streaming; load real model | integrate real model behind API | streaming end to end | polish; p50/p95 latency |
+| **P6** | React scaffold; mock API (static JSON) | cardholder confirm screen (mock) | analyst view (mock) | polish | wire to real API | fixes | demo polish |
+| **P7** | dashboard scaffold; Airflow skeleton | KPIs + charts (mock /metrics) | dashboards done; draft retrain DAG | DAG runs retrain + drift | wire real /metrics | live replay (WebSocket) | polish; demo |
 
 ### Shared milestones
-- Day 1: everyone agrees and freezes the 3 contracts, then branches.
-- Day 5: integration 1 (batch path, real model and API).
-- Day 6: integration 2 (streaming path).
-- Day 7: rehearse the demo, write results, buffer for slippage.
+| Day | Milestone |
+| --- | --- |
+| **1** | All seven agree and freeze the 3 contracts, then branch |
+| **5** | Integration 1: batch path, real model and API |
+| **6** | Integration 2: streaming path (Kafka to Spark to score) |
+| **7** | Rehearse the demo, write results, buffer |
 
 ## Scope discipline
 
