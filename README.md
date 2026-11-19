@@ -24,6 +24,141 @@ Production layer: Kafka and Spark Structured Streaming on the real-time scoring 
 
 Rule: the core must run without the production layer. If streaming or orchestration slips, the demo still works.
 
+
+## Architecture diagrams
+
+### Overview
+
+```mermaid
+flowchart TD
+    A["Data + time split"] --> B["Features: tabular + graph"]
+    B --> C["Model: XGBoost + SHAP"]
+    C --> D["Scoring API: FastAPI"]
+    D --> E["Apps + dashboards"]
+    E -->|"confirmed labels"| C
+    classDef data fill:#eef2f7,stroke:#5b6b7a,color:#1f2d3d;
+    classDef core fill:#e5f4ec,stroke:#2e7d57,color:#13351f;
+    classDef serve fill:#fbeadf,stroke:#b4552b,color:#5a2410;
+    class A data;
+    class B,C core;
+    class D,E serve;
+```
+
+### In depth
+
+```mermaid
+flowchart TD
+    subgraph DATA["Data"]
+      D1["IEEE-CIS data"] --> D2["Time-based split<br/>train / val / test"]
+    end
+    subgraph FEAT["Features"]
+      F1["Tabular<br/>Featuretools + target encoding"]
+      F2["Graph<br/>NetworkX"]
+    end
+    subgraph MODEL["Model"]
+      M1["XGBoost + SHAP"]
+      M2["Eval<br/>PR-AUC, KS, detection@budget"]
+    end
+    subgraph SERVE["Serving"]
+      S1["Kafka<br/>event stream"] --> S2["Spark Streaming"]
+      S2 --> S3["FastAPI scoring"]
+      S3 --> S4[("Postgres")]
+    end
+    subgraph APPS["Product"]
+      A1["Cardholder app"]
+      A2["Analyst dashboard"]
+    end
+    O1["Airflow<br/>retrain + drift"]
+
+    D2 --> F1
+    D2 --> F2
+    F1 --> M1
+    F2 --> M1
+    M1 --> M2
+    M1 --> S3
+    S3 --> A1
+    S3 --> A2
+    A1 -->|"confirmed labels"| S4
+    S4 -->|"labels"| O1
+    O1 -->|"retrain next version"| M1
+
+    classDef data fill:#eef2f7,stroke:#5b6b7a,color:#1f2d3d;
+    classDef core fill:#e5f4ec,stroke:#2e7d57,color:#13351f;
+    classDef serve fill:#fbeadf,stroke:#b4552b,color:#5a2410;
+    classDef orch fill:#fcf0d9,stroke:#9a6a12,color:#4a3206;
+    class D1,D2 data;
+    class F1,F2,M1,M2 core;
+    class S1,S2,S3,S4,A1,A2 serve;
+    class O1 orch;
+```
+
+### Per-person architecture
+
+Each person owns one small, well-bounded piece. These show what you take in and what you hand off.
+
+**P1 — Data and split**
+```mermaid
+flowchart LR
+    R["IEEE-CIS raw"] --> S["Time-based split"]
+    S --> O["train / val / test<br/>+ sample.parquet"]
+    O -.->|"data_schema"| T["P2, P3, P4"]
+```
+
+**P2 — Tabular features (open-source FE)**
+```mermaid
+flowchart LR
+    I["train/val/test<br/>from P1"] --> FT["Featuretools DFS<br/>cutoff times"]
+    I --> TE["Target encoding<br/>category_encoders"]
+    FT --> O["tab_* features"]
+    TE --> O
+    O -.->|"to model"| M["P4"]
+```
+
+**P3 — Graph features**
+```mermaid
+flowchart LR
+    I["train/val/test<br/>from P1"] --> G["Identifier graph<br/>NetworkX"]
+    G --> C["g_* features<br/>cluster size, neighbor stats"]
+    C -.->|"to model"| M["P4"]
+```
+
+**P4 — Model and evaluation**
+```mermaid
+flowchart LR
+    F["tab_* + g_*<br/>from P2, P3"] --> X["XGBoost"]
+    X --> SH["SHAP reasons"]
+    X --> E["Eval: PR-AUC, KS,<br/>detection@budget"]
+    X --> A["model artifacts"]
+    A -.->|"model_interface"| P5["P5"]
+```
+
+**P5 — Serving and streaming**
+```mermaid
+flowchart LR
+    K["Kafka<br/>event stream"] --> SP["Spark Streaming"]
+    MOD["model artifacts<br/>from P4"] --> API["FastAPI scoring"]
+    SP --> API
+    API --> DB[("Postgres")]
+    API -.->|"api_contract"| UI["P6, P7"]
+```
+
+**P6 — Front end**
+```mermaid
+flowchart LR
+    API["Scoring API<br/>from P5"] --> C["Cardholder app"]
+    API --> AN["Analyst view"]
+    C -->|"confirm yes/no"| API
+```
+
+**P7 — Dashboards and orchestration**
+```mermaid
+flowchart LR
+    MET["metrics API<br/>from P5"] --> D["Dashboards<br/>React + Recharts"]
+    L[("labels<br/>Postgres")] --> AF["Airflow DAG<br/>retrain + drift"]
+    AF -.->|"retrain"| MOD["P4 model"]
+```
+
+
 ## Tech stack and the why
 
 | Tool | Where | Why (interview answer) |
