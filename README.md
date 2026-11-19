@@ -4,23 +4,23 @@ A real-time card fraud detection system built on the IEEE-CIS dataset, sponsored
 
 ## What this is
 
-A model that scores a card transaction for fraud, wrapped in a working system: real-time scoring, explanations for each flag, a cardholder confirmation app whose answers retrain the model, and an analyst dashboard. The model is the assignment; the system around it is what makes it more than a notebook.
+A model that scores a card transaction for fraud, wrapped in a working system: real-time scoring, an explanation for each flag, a cardholder confirmation app whose answers retrain the model, and an analyst dashboard. The model is the assignment; the system around it is what makes it more than a notebook.
 
 ## Our "why" (read before interviews)
 
-We justify every tool by the shape of the problem, not the size of the data. The dataset fits in memory, so we did not need distributed compute for volume. We chose streaming and orchestration deliberately to build and reason about the production architecture:
+We justify every tool by the shape of the problem, not the size of the data. The dataset fits in memory, so we did not need distributed compute for volume. We chose streaming and orchestration deliberately, to build and reason about the production architecture:
 
 - Fraud is a real-time event problem (decisions in milliseconds during authorization), so the scoring path is a stream.
 - Production ML is recurring, scheduled, dependency-managed work, so retraining and drift checks are orchestrated.
-- The data fits in memory, so the core runs in plain Python where every step is legible. We can explain how each heavier tool would earn its place at real volume.
+- The data fits in memory, so the core runs in plain Python where every step is legible, and we can explain how each heavier tool would earn its place at real volume.
 
 ## Architecture
 
-Two layers. A transparent core (the backbone, must work) and a production layer (the hireable tools, wraps the core and never blocks it).
+Two layers. A transparent core (the backbone, must work) and a production layer (the hireable tools, which wrap the core and never block it).
 
-Core pipeline: data and time-based split -> features (tabular + graph) -> model (XGBoost + SHAP) + honest evaluation -> FastAPI scoring -> product (apps + dashboards).
+Core pipeline: data and time-based split, then features (tabular + graph), then model (XGBoost + SHAP) with honest evaluation, then FastAPI scoring, then product (apps + dashboards).
 
-Production layer: Kafka + Spark Structured Streaming on the real-time scoring path; Airflow orchestrating feature rebuilds, retraining, and drift checks. Diagrams in `docs/`.
+Production layer: Kafka and Spark Structured Streaming on the real-time scoring path; Airflow orchestrating feature rebuilds, retraining, and drift checks. Diagrams in docs/.
 
 Rule: the core must run without the production layer. If streaming or orchestration slips, the demo still works.
 
@@ -33,7 +33,7 @@ Rule: the core must run without the production layer. If streaming or orchestrat
 | XGBoost + SHAP | model, reasons | Strong tabular model; SHAP gives per-flag reasons |
 | FastAPI + Docker | scoring service | Low-latency scoring endpoint we fully control |
 | Kafka | event stream | Fraud is a real-time event stream |
-| Spark Structured Streaming | stream processor | Score events on arrival; builds on our CS 4371 Spark work |
+| Spark Structured Streaming | stream processor | Score events on arrival; fraud is a real-time stream |
 | Airflow | orchestration | Retraining and drift are recurring scheduled jobs |
 | React | front end | Full control over the display |
 | Postgres | app state | Labels and card status |
@@ -58,44 +58,104 @@ dashboards/     metrics dashboards                        (P7)
 docs/           diagrams and notes
 ```
 
-## Team: 7 roles, no overlap
-
-Each person owns one folder. Cross-person needs go through `contracts/`, never by editing someone else's folder.
-
-- P1 Data lead: `data/`, owns the time-based split and the `data_schema` contract.
-- P2 Tabular features: `features/tabular/`.
-- P3 Graph features: `features/graph/` (NetworkX).
-- P4 Model and evaluation: `model/`, owns the model-interface contract.
-- P5 Serving and streaming: `serving/` (FastAPI, Kafka, Spark). Heaviest role; gets help at integration.
-- P6 Front end: `frontend/`, co-owns the `api_contract` with P5.
-- P7 Dashboards and orchestration: `dashboards/` and `airflow/`. Second heaviest; gets help at integration.
-
-## The 3 contracts (agree on Day 1, before building)
+## The 3 contracts (agree and freeze on Day 1)
 
 Everyone builds against these, so nobody waits on anyone until integration.
 
-1. Data schema: columns and types of the train/val/test tables (owner P1).
-2. Model interface: input row format in, {score, top SHAP reasons} out (owner P4).
-3. API contract: the JSON for `/score`, `/alerts`, `/metrics` (owners P5 and P6).
+1. contracts/data_schema.md: columns and types of the train/val/test tables, and the split rule (owner P1).
+2. contracts/model_interface.md: input row in, {score, band, reasons} out (owner P4).
+3. contracts/api_contract.md: the JSON for /score, /alerts, /metrics (owners P5 and P6).
 
-Commit a tiny sample dataset and hardcoded sample JSON on Day 1 so the front end and dashboards can mock everything immediately.
+Commit a tiny sample dataset and hardcoded sample JSON on Day 1, so the front end and dashboards can mock everything immediately.
 
-## 7-day plan
+## Per-person plan (7 people, 7 days)
 
-Hard dependencies are only: Day 1 contracts, P1's split handoff (others use the sample until then), and the two integration days. Everything else runs in parallel on mocks.
+Each person owns one folder. Cross-person needs go through contracts/, never by editing someone else's folder. The only real handoffs are: P1's split (Day 2), features to model (Days 3 to 4), model to serving (Days 4 to 5), and API to front end and dashboards (Days 5 to 6). Everything else runs in parallel against the frozen contracts and mocks.
 
-- Day 1 (all): repo setup, lock the 3 contracts, commit sample data. P1 starts the split. Everyone branches: `p1-data`, `p2-tabular`, ... and opens PRs into `main`.
-- Day 2: P1 publishes the real split. P2/P3 build features against the schema. P4 scaffolds the model and eval harness on sample features. P5 stands up FastAPI on a dummy model and gets Kafka running locally. P6 builds UI on the mock API. P7 builds dashboards on mock metrics and drafts the Airflow skeleton.
-- Day 3: P2/P3 finish a first feature pass. P4 trains the first real model. P5 scores via the dummy and gets a Kafka replay working. P6 UI functional on mocks. P7 dashboards functional on mocks; first retrain DAG drafted.
-- Day 4: P4 combines tabular + graph features, produces real model + SHAP + honest evaluation numbers. P5 wires Spark Structured Streaming onto Kafka. P6 polishes. P7 runs the retrain DAG end to end on a schedule.
-- Day 5 (integration 1, batch path): swap mocks for real. P5 loads P4's real model; P6 and P7 point to the real API. End-to-end on the batch path.
-- Day 6 (integration 2, streaming path): Kafka -> Spark -> scoring -> dashboard live. Fix interface mismatches. Full dry run.
-- Day 7: polish, rehearse the demo, write results into this README, buffer for slippage.
+### P1 — Data and split  (folder: data/)
+Provides: train/val/test tables + sample.parquet. Owns the data_schema contract. Needs: nothing (starts first).
+- D1: agree data_schema, write the time-split logic, commit sample.parquet to contracts/sample_data.
+- D2: publish real train/val/test to the shared drive. Unblocks P2, P3, P4.
+- D3: verify no leakage, document columns.
+- D4-5: fix any schema issues features or model hit.
+- D6-7: integration support.
+
+### P2 — Tabular features  (folder: features/tabular/)
+Provides: tab_* feature table. Needs: data schema (P1).
+- D1: read schema, start on the sample.
+- D2: build tab_* on the real train split (frequency encodings, per-card aggregates, amount and time features).
+- D3: finish first pass, check the join keys with P1.
+- D4: refine, hand the final table to P4.
+- D5-7: fix issues flagged by eval, integration.
+
+### P3 — Graph features  (folder: features/graph/)
+Provides: g_* feature table. Needs: data schema (P1).
+- D1: read schema, design nodes and edges on the sample.
+- D2: build the identifier graph (card, device, email) with NetworkX.
+- D3: compute g_* (cluster size, degree, time-aware neighbor fraud rate), enforcing the past-only rule.
+- D4: finalize, hand to P4.
+- D5-7: integration, explainability support.
+
+### P4 — Model and evaluation  (folder: model/)
+Provides: model.pkl, transform.pkl, feature_list.json, score_mapping.json, honest metrics. Owns the model-interface contract. Needs: features (P2, P3).
+- D1: scaffold training + eval harness on mock features; write model_interface.
+- D2: baseline model on tab_*.
+- D3: combine tab_* + g_*, first real model + SHAP.
+- D4: tune, publish artifacts, report PR-AUC, KS, detection at review budget.
+- D5: hand model to P5.
+- D6-7: final eval, with-vs-without-graph comparison, results into this README.
+
+### P5 — Serving and streaming  (folder: serving/)  [heaviest role]
+Provides: scoring API + streaming path. Co-owns the API contract. Needs: model interface (P4), uses a dummy model until D4.
+- D1: FastAPI on a dummy model returning the ScoreResult shape; Docker.
+- D2: build /score, /alerts, /alerts/respond on the dummy + Postgres.
+- D3: Kafka running locally + a replay script.
+- D4: Spark Structured Streaming consuming Kafka; load P4's real model.
+- D5: integration, real model behind the API.
+- D6: streaming path end to end (Kafka to Spark to score to db).
+- D7: polish, report p50 and p95 latency.
+
+### P6 — Front end  (folder: frontend/)
+Provides: cardholder + analyst apps. Co-owns the API contract. Needs: API contract (mock until D5).
+- D1: scaffold React, read the API contract, set up a mock API with static JSON.
+- D2: cardholder confirm screen on the mock.
+- D3: analyst view on the mock.
+- D4: polish.
+- D5: integration, point to the real API.
+- D6-7: fixes, demo polish.
+
+### P7 — Dashboards and orchestration  (folder: dashboards/, airflow/)  [second heaviest]
+Provides: metrics dashboards + Airflow DAGs. Needs: /metrics contract (mock until D5).
+- D1: scaffold the dashboard on mock /metrics; Airflow skeleton (docker-compose).
+- D2: KPI cards + charts on the mock.
+- D3: dashboards functional; draft the retrain DAG.
+- D4: DAG runs retrain on a schedule + a drift check.
+- D5: integration, real /metrics.
+- D6: live replay over WebSocket if time allows.
+- D7: polish, demo.
+
+### Shared milestones
+- Day 1: everyone agrees and freezes the 3 contracts, then branches.
+- Day 5: integration 1 (batch path, real model and API).
+- Day 6: integration 2 (streaming path).
+- Day 7: rehearse the demo, write results, buffer for slippage.
 
 ## Scope discipline
 
 Must finish (the grade): core model, honest time-split evaluation, FastAPI scoring, one front end. Stretch, only if the core is done: cardholder feedback loop, streaming path, Airflow. Future work (slide, not build): federated learning, extra dashboards, Databricks. A working core with a partial production layer demos well; a half-built everything does not.
 
+Note: Kafka, Spark, and Airflow may be new to the team. They are the heaviest tools here, so treat the production layer as a deliberate stretch and protect the core first.
+
 ## How to run
 
 (Fill in as pieces land: how to start the API, run the pipeline, launch the front end, bring up Kafka and Airflow.)
+
+## Branch workflow
+
+Each person works on their own branch and opens a pull request into main. Edit only your own folder; contracts/ and this README change by agreement.
+
+```
+git checkout -b p3-graph
+# work in your folder, commit, then:
+git push -u origin p3-graph
+```
