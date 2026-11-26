@@ -1,0 +1,19 @@
+# python
+__pycache__/
+*.pyc
+.venv/
+venv/
+.env
+# node
+node_modules/
+dist/
+# data and models (share these via the drive, not git)
+data/*.csv
+data/*.parquet
+model/*.pkl
+model/*.joblib
+!**/.gitkeep
+# os / editor
+.DS_Store
+.idea/
+.vscode/
